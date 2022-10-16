@@ -2,6 +2,8 @@
 using System.Drawing;
 using System.Windows.Forms;
 using System.Collections.Generic;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ProgressBar;
+using System.Drawing.Drawing2D;
 
 namespace VectorForms
 {
@@ -16,13 +18,13 @@ namespace VectorForms
         // Половина высоты pictureBox
         public int SizeY { get; private set; }
         // Поиск максимума/минимума
-        private bool maximum=true;
+        private bool Maximum=true;
         // Левая граница
         private int tbLeft = -3;
         // Правая граница
         private int tbRight=5;
         // Точность вычислений
-        private double accurate=1;
+        private double Accurate=1;
 
         //Начальные установки
         public vectorform1()
@@ -56,7 +58,7 @@ namespace VectorForms
             }
             if (tbAcc.Text!="")
             {
-                accurate = double.Parse(tbAcc.Text);
+                Accurate = double.Parse(tbAcc.Text);
             }
             if (tbL.Text!="")
             {
@@ -146,8 +148,8 @@ namespace VectorForms
             double count = tbLeft;
             while (count <= tbRight)
             {
-                x.Add(new double[] { Math.Round(count, 2), Math.Round(Math.Sqrt(25 - Math.Pow(count, 2)), 4) });
-                count += accurate;
+                x.Add(new double[] { Math.Round(count, 2), F(count) });
+                count += Accurate;
             }
 
             Point[] points = new Point[x.Count];
@@ -177,13 +179,13 @@ namespace VectorForms
                 }
             }
 
-            if (maximum)
+            if (Maximum)
             {
-                tbAns1.Text = $"Максимум при x={Max[0]}: y ={Max[1]}";
+                tbAns1.Text = $"Максимум при x={Max[0]}: y ={Max[1]} при ε = {Accurate}";
             }
             else
             {
-                tbAns1.Text = $"Минимум при x={Min[0]}: y ={Min[1]}";
+                tbAns1.Text = $"Минимум при x={Min[0]}: y ={Min[1]} при ε = {Accurate}";
             }
 
             FigureDisplay(points);
@@ -191,8 +193,44 @@ namespace VectorForms
 
         //Метод дихотомии 
         private void DichotomyMethod()
+        {           
+            double a= tbLeft, b= tbRight;
+            double c = (a + b) / 2;
+
+            int i = 0;
+
+            tbAns2.Text = "   Результаты значения функции";
+            //while (Math.Abs(Math.Round(F(c + Accurate) - F(c - Accurate), 4)) > Accurate)
+            while (F(c+Accurate)!=F(c-Accurate))
+            {
+                tbAns2.Text += Environment.NewLine + $"x{i} = {c} +/- {Accurate}";
+                tbAns2.Text += Environment.NewLine + $"     F+({c + Accurate}) = {F(c + Accurate)}";
+                tbAns2.Text += Environment.NewLine + $"     F-({c - Accurate}) = {F(c - Accurate)}";
+
+                if (F(c+Accurate)<F(c-Accurate))
+                {
+                    b = c;
+                }
+                else
+                {
+                    a = c;
+                }
+
+                c = (a + b) / 2;
+                i++;
+            }
+
+            tbAns2.Text += Environment.NewLine + $"x{i} = {c} +/- {Accurate}";
+            tbAns2.Text += Environment.NewLine + $"     F+({c + Accurate}) = {F(c + Accurate)}";
+            tbAns2.Text += Environment.NewLine + $"     F-({c - Accurate}) = {F(c - Accurate)}";
+
+            tbAns1.Text = $"Максимум при x={c}: y ={F(c)} при ε = {Accurate}";
+        }
+
+        //Функция f(x)
+        static double F(double x)
         {
-            throw new NotImplementedException();
+            return Math.Round(Math.Sqrt(25 - Math.Pow(x, 2)), 4);
         }
 
         //Метод золотого сечения
@@ -249,13 +287,13 @@ namespace VectorForms
         // Находим максимум
         private void bMax_Click(object sender, EventArgs e)
         {
-            maximum = true;
+            Maximum = true;
         }
 
         // Находим минимум
         private void bMin_Click(object sender, EventArgs e)
         {
-            maximum = false;
+            Maximum = false;
         }
 
         // Рисовка системы координат
@@ -350,6 +388,71 @@ namespace VectorForms
             result[1] = new PointF(x2, y2);
             result[2] = new PointF(n.X - v1.Y * width, n.Y + v1.X * width);
             return result;
+        }
+
+        //Тоже "Выполнить работу"
+        private void tbAcc_KeyPress(object sender, KeyPressEventArgs ex)
+        {
+            if (ex.KeyChar == (char)13)
+            {
+                splitContainer1.Panel1.Enabled = false;
+
+                if (tbResolution.Text != "")
+                {
+                    PIX_IN_ONE = int.Parse(tbResolution.Text);
+                }
+                if (tbAcc.Text != "")
+                {
+                    Accurate = double.Parse(tbAcc.Text);
+                }
+                if (tbL.Text != "")
+                {
+                    tbLeft = int.Parse(tbL.Text);
+                }
+                if (tbR.Text != "")
+                {
+                    tbRight = int.Parse(tbR.Text);
+                }
+
+                if (25 - Math.Pow(tbLeft, 2) < 0 || 25 - Math.Pow(tbRight, 2) < 0)
+                {
+                    MessageBox.Show("Выход за ОДЗ!");
+                    splitContainer1.Panel1.Enabled = true;
+                    return;
+                }
+                if (tbLeft > tbRight)
+                {
+                    MessageBox.Show("Неверный ввод границ!");
+                    splitContainer1.Panel1.Enabled = true;
+                    return;
+                }
+
+                if (Bar1.Visible == true)
+                {
+                    Bar1.Visible = false;
+                    Bar1.Value = 0;
+                    lAns.Visible = false;
+                    tbAns1.Visible = false;
+                    label6.Visible = false;
+                    tbAns2.Visible = false;
+                }
+
+                Bar1.Visible = true;
+                while (Bar1.Value != Bar1.Maximum)
+                {
+                    Bar1.PerformStep();
+                    System.Threading.Thread.Sleep(100);
+                }
+
+                Task();
+
+                lAns.Visible = true;
+                tbAns1.Visible = true;
+                label6.Visible = true;
+                tbAns2.Visible = true;
+
+                splitContainer1.Panel1.Enabled = true;
+            }
         }
     }
 }

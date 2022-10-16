@@ -131,6 +131,7 @@ namespace VectorForms
             this.rbMethod6.TabStop = true;
             this.rbMethod6.Text = "Касательных (Ньютона)";
             this.rbMethod6.UseVisualStyleBackColor = true;
+            this.rbMethod6.Visible = false;
             // 
             // rbMethod5
             // 
@@ -143,6 +144,7 @@ namespace VectorForms
             this.rbMethod5.TabStop = true;
             this.rbMethod5.Text = "Хорд";
             this.rbMethod5.UseVisualStyleBackColor = true;
+            this.rbMethod5.Visible = false;
             // 
             // rbMethod4
             // 
@@ -155,6 +157,7 @@ namespace VectorForms
             this.rbMethod4.TabStop = true;
             this.rbMethod4.Text = "Фибоначчи";
             this.rbMethod4.UseVisualStyleBackColor = true;
+            this.rbMethod4.Visible = false;
             // 
             // rbMethod3
             // 
@@ -167,6 +170,7 @@ namespace VectorForms
             this.rbMethod3.TabStop = true;
             this.rbMethod3.Text = "Зотого сечения";
             this.rbMethod3.UseVisualStyleBackColor = true;
+            this.rbMethod3.Visible = false;
             // 
             // rbMethod2
             // 
@@ -242,6 +246,7 @@ namespace VectorForms
             this.tbAcc.ShortcutsEnabled = false;
             this.tbAcc.Size = new System.Drawing.Size(300, 24);
             this.tbAcc.TabIndex = 24;
+            this.tbAcc.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tbAcc_KeyPress);
             // 
             // label7
             // 
@@ -408,6 +413,7 @@ namespace VectorForms
             this.bMin.TabIndex = 5;
             this.bMin.Text = "Min";
             this.bMin.UseVisualStyleBackColor = false;
+            this.bMin.Visible = false;
             this.bMin.Click += new System.EventHandler(this.bMin_Click);
             // 
             // bMax
